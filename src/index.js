@@ -62,7 +62,17 @@ function createCompatibleModuleInBundle(transpiledJs, transpiledWasm) {
 
 function createCompatibleModuleOutBundle(publicPath) {
     return `
-        var f=fetch(${publicPath}).then(function(response){
+        let xfetch = typeof fetch === "function" ? fetch.bind(window) : function fetch_node(file) {
+            return new Promise((resolve, reject) => {
+            (fs || (fs = eval("equire".replace(/^/, "r"))("fs")))
+            .readFile(file, (err, data) => {
+                return err
+                ? reject(err)
+                : resolve({ arrayBuffer: () => new Uint8Array(data).buffer });
+            })
+            });
+        };
+        var f=xfetch(${publicPath}).then(function(response){
             return response.arrayBuffer();
         }).then(function(binary){
                 var module = new WebAssembly.Module(binary);

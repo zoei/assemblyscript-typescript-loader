@@ -1,6 +1,6 @@
 {
-  "name": "assemblyscript-typescript-loader",
-  "version": "1.3.3-0",
+  "name": "@zoei/assemblyscript-typescript-loader",
+  "version": "1.3.4",
   "description": "A webpack loader for compiles typescript with assemblyscript and bundles it as wasm or btyes string",
   "main": "dist/index.js",
   "files": [
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SinaMFE/assemblyscript-typescript-loader.git"
+    "url": "git+https://github.com/zoei/assemblyscript-typescript-loader.git"
   },
   "keywords": [
     "typescript",
@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/SinaMFE/assemblyscript-typescript-loader#readme",
   "dependencies": {
-    "assemblyscript": "AssemblyScript/assemblyscript",
+    "assemblyscript": "github:AssemblyScript/assemblyscript",
     "loader-utils": "^1.1.0",
     "mime": "^2.2.0",
     "ts-loader": "^3.5.0",
@@ -77,5 +77,8 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "directories": {
+    "test": "test"
   }
 }
