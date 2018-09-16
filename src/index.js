@@ -64,7 +64,7 @@ function createCompatibleModuleOutBundle(publicPath) {
     return `
         function fetch_node(file) {
             return new Promise((resolve, reject) => {
-            (fs || (fs = eval("equire".replace(/^/, "r"))("fs")))
+            (typeof fs === 'undefined' ? (fs = eval("equire".replace(/^/, "r"))("fs")) : fs)
             .readFile(file, (err, data) => {
                 return err
                 ? reject(err)
@@ -72,7 +72,7 @@ function createCompatibleModuleOutBundle(publicPath) {
             })
             });
         };
-        let xfetch = typeof location !== 'undefined' && location.protocol === 'file:' ? fetch_node : typeof fetch === "function" ? fetch.bind(window) : fetch_node
+        let xfetch = typeof location !== 'undefined' && location.protocol === 'file:' ? fetch_node : typeof fetch === "function" ? fetch.bind(window) : fetch_node;
         var f=xfetch(${publicPath}).then(function(response){
             return response.arrayBuffer();
         }).then(function(binary){
