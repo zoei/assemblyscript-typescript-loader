@@ -62,7 +62,7 @@ function createCompatibleModuleInBundle(transpiledJs, transpiledWasm) {
 
 function createCompatibleModuleOutBundle(publicPath) {
     return `
-        let xfetch = typeof fetch === "function" ? fetch.bind(window) : function fetch_node(file) {
+        function fetch_node(file) {
             return new Promise((resolve, reject) => {
             (fs || (fs = eval("equire".replace(/^/, "r"))("fs")))
             .readFile(file, (err, data) => {
@@ -72,6 +72,7 @@ function createCompatibleModuleOutBundle(publicPath) {
             })
             });
         };
+        let xfetch = typeof location !== 'undefined' && location.protocol === 'file:' ? fetch_node : typeof fetch === "function" ? fetch.bind(window) : fetch_node
         var f=xfetch(${publicPath}).then(function(response){
             return response.arrayBuffer();
         }).then(function(binary){
