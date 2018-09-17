@@ -62,23 +62,31 @@ function createCompatibleModuleInBundle(transpiledJs, transpiledWasm) {
 
 function createCompatibleModuleOutBundle(publicPath) {
     return `
-        function fetch_node(file) {
+        function fetchModule(url) {
             return new Promise((resolve, reject) => {
-            (typeof fs === 'undefined' ? (fs = eval("equire".replace(/^/, "r"))("fs")) : fs)
-            .readFile(file, (err, data) => {
-                return err
-                ? reject(err)
-                : resolve({ arrayBuffer: () => new Uint8Array(data).buffer });
+                var xhr;
+                if (window.XMLHttpRequest) {
+                    xhr = new XMLHttpRequest();    
+                } else {
+                    xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status == 200){
+                        resolve(xhr.response)
+                    }
+                }
+                xhr.responseType = 'arraybuffer';
+                xhr.timeout = 30000;
+                xhr.ontimeout = reject;
+                
+                xhr.open('GET', url, true);
+                xhr.send();
             })
-            });
-        };
-        let xfetch = typeof location !== 'undefined' && location.protocol === 'file:' ? fetch_node : typeof fetch === "function" ? fetch.bind(window) : fetch_node;
-        var f=xfetch(${publicPath}).then(function(response){
-            return response.arrayBuffer();
-        }).then(function(binary){
-                var module = new WebAssembly.Module(binary);
-                var instance = new WebAssembly.Instance(module, { env: { abort: function() {} } });
-                return instance.exports;
+        }
+        var f = fetchModule(${publicPath}).then(function(binary){
+            var module = new WebAssembly.Module(binary);
+            var instance = new WebAssembly.Instance(module, { env: { abort: function() {} } });
+            return instance.exports;
         });
         module.exports =f;
             `;
